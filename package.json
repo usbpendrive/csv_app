@@ -1,0 +1,20 @@
+{
+  "name": "csv_app",
+  "version": "1.0.0",
+  "description": "An app to write contact information to a csv file",
+  "homepage": "https://github.com/usbpendrive/csv_app#readme",
+  "bugs": {
+    "url": "https://github.com/usbpendrive/csv_app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usbpendrive/csv_app.git"
+  },
+  "license": "ISC",
+  "author": "usbpendrive",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
