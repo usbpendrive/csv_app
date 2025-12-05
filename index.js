@@ -1,14 +1,18 @@
-import { appendFileSync } from 'fs';
-import { createInterface } from "readline";
+import prompt from 'prompt';
+import { createObjectCsvWriter } from "csv-writer";
 
+prompt.start();
+prompt.message = "";
 
-const readline = createInterface({
-    input: process.stdin,
-    output: process.stdout
+const csvWriter = createObjectCsvWriter({
+    path: "./contact.csv",
+    append: true,
+    header: [
+        { id: "name", title: "NAME"},
+        { id: "number", title: "NUMBER"},
+        { id: "email", title: "EMAIL"},
+    ],
 });
-
-const readLineAsync = (message) =>
-    new Promise((resolve) => readline.question(message, resolve));
 
 class Person {
     constructor(name = "",  number = "", email = "") {
@@ -17,34 +21,33 @@ class Person {
         this.email = email;
     }
 
-    saveToCSV() {
-        const content = `${this.name}, ${this.number}, ${this.email}\n`;
+    async saveToCSV() {
         try {
-            appendFileSync("./contact.csv", content);
-            console.log(`${this.name} saved!`);
-        } catch (err) {
-            console.log(err);
+            const  { name, number, email } = this;
+            await csvWriter.writeRecords([{ name, number, email }]);
+            console.log(`${name} saved!`);
+        } catch (error) {
+            console.log(error);
         }
     }
 }
 
-
 const startApp = async () => {
-    let shouldContinue = true;
-    while (shouldContinue) {
-        const name = await readLineAsync("Contact name: ");
-        const number = await readLineAsync("Contact number: ");
-        const email = await readLineAsync("Contact email: ");
+    const questions = [
+        {name: "name", description: "Contact Name"},
+        {name: "number", description: "Contact Number"},
+        {name: "email", description: "Contact Email"},
+    ];
 
-        const person = new Person(name, number, email);
-        person.saveToCSV();
+    const responses = await prompt.get(questions);
+    const person = new Person(responses.name, responses.number, responses.email);
+    await person.saveToCSV();
 
-        const response = await readLineAsync("Continue? [y to continue]: ");
-        shouldContinue = response.toLowerCase() === "y";
-    }
+    const { again } = await prompt.get([
+        { name: "again", description: "Continue? [y to continue]" },
+    ]);
 
-
-    readline.close();
-}
+    if (again.toLowerCase() === "y") await startApp();
+};
 
 startApp();
